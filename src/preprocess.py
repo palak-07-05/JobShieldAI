@@ -1,46 +1,120 @@
 import re
 
+# =========================================
+# CLEAN TEXT FUNCTION
+# =========================================
+
 def clean_text(text):
 
     # =========================================
-    # HANDLE NONE VALUES
+    # HANDLE EMPTY INPUT
     # =========================================
 
     if text is None:
+
         return ""
 
-    # Convert to string & lowercase
-    text = str(text).lower()
+    # CONVERT TO STRING
+
+    text = str(text)
+
+    # LOWERCASE
+
+    text = text.lower()
 
     # =========================================
     # REMOVE URLS
     # =========================================
 
-    text = re.sub(r'http\S+|www\S+', ' ', text)
+    text = re.sub(
+
+        r"http\S+|www\S+|https\S+",
+
+        " ",
+
+        text
+    )
 
     # =========================================
     # REMOVE EMAILS
     # =========================================
 
-    text = re.sub(r'\S+@\S+', ' ', text)
+    text = re.sub(
+
+        r"\S+@\S+",
+
+        " ",
+
+        text
+    )
+
+    # =========================================
+    # REMOVE PHONE NUMBERS
+    # =========================================
+
+    text = re.sub(
+
+        r"\+?\d[\d\s\-]{7,}",
+
+        " ",
+
+        text
+    )
 
     # =========================================
     # REMOVE NUMBERS
     # =========================================
 
-    text = re.sub(r'\d+', ' ', text)
+    text = re.sub(
+
+        r"\d+",
+
+        " ",
+
+        text
+    )
 
     # =========================================
     # REMOVE SPECIAL CHARACTERS
     # =========================================
 
-    text = re.sub(r'[^a-zA-Z\s]', ' ', text)
+    text = re.sub(
+
+        r"[^a-zA-Z\s]",
+
+        " ",
+
+        text
+    )
+
+    # =========================================
+    # REMOVE SINGLE LETTERS
+    # =========================================
+
+    text = re.sub(
+
+        r"\b[a-zA-Z]\b",
+
+        " ",
+
+        text
+    )
 
     # =========================================
     # REMOVE EXTRA SPACES
     # =========================================
 
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(
 
-    # Final cleaned text
+        r"\s+",
+
+        " ",
+
+        text
+    )
+
+    # =========================================
+    # RETURN CLEANED TEXT
+    # =========================================
+
     return text.strip()

@@ -1,5 +1,22 @@
 import pandas as pd
-import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# =========================================
+# TF-IDF VECTORIZER
+# =========================================
+
+def get_vectorizer():
+
+    return TfidfVectorizer(
+        max_features=10000,
+        ngram_range=(1, 2),
+        stop_words="english",
+        min_df=2
+    )
+
+# =========================================
+# FEATURE ENGINEERING
+# =========================================
 
 def add_features(df):
 
@@ -7,128 +24,188 @@ def add_features(df):
     # REQUIRED COLUMNS
     # =========================================
 
-    columns = [
-        'title',
-        'company_profile',
-        'description',
-        'requirements',
-        'benefits'
+    required_columns = [
+
+        "title",
+        "company_profile",
+        "description",
+        "requirements",
+        "benefits"
     ]
 
-    # Add missing columns safely
-    for col in columns:
+    # ADD MISSING COLUMNS SAFELY
+
+    for col in required_columns:
 
         if col not in df.columns:
+
             df[col] = ""
 
     # =========================================
     # CREATE MAIN TEXT COLUMN
     # =========================================
 
-    df['text'] = (
+    df["text"] = (
 
-        df['title'].fillna('') + " " +
+        df["title"].fillna("").astype(str) + " " +
 
-        df['company_profile'].fillna('') + " " +
+        df["company_profile"].fillna("").astype(str) + " " +
 
-        df['description'].fillna('') + " " +
+        df["description"].fillna("").astype(str) + " " +
 
-        df['requirements'].fillna('') + " " +
+        df["requirements"].fillna("").astype(str) + " " +
 
-        df['benefits'].fillna('')
+        df["benefits"].fillna("").astype(str)
     )
 
-    # Convert to lowercase
-    df['text'] = df['text'].astype(str).str.lower()
+    # =========================================
+    # CLEAN TEXT
+    # =========================================
+
+    df["text"] = (
+
+        df["text"]
+
+        .str.lower()
+
+        .str.replace(r"\s+", " ", regex=True)
+
+        .str.strip()
+    )
 
     # =========================================
     # SCAM FEATURES
     # =========================================
 
-    # Payment / registration scams
-    df['has_fee'] = df['text'].str.contains(
-        r'fee|payment|registration|deposit|security amount|processing fee',
+    # PAYMENT / FEES
+
+    df["has_fee"] = df["text"].str.contains(
+
+        r"fee|payment|registration|deposit|processing fee|security amount",
+
         regex=True,
         na=False
+
     ).astype(int)
 
-    # Urgency scams
-    df['has_urgent'] = df['text'].str.contains(
-        r'urgent|immediate joining|quick hiring|apply now|limited seats',
+    # URGENCY WORDS
+
+    df["has_urgent"] = df["text"].str.contains(
+
+        r"urgent|apply now|limited seats|immediate joining|quick hiring",
+
         regex=True,
         na=False
+
     ).astype(int)
 
-    # Money attraction scams
-    df['has_money_words'] = df['text'].str.contains(
-        r'earn money|high salary|income|weekly payout|daily payout|easy money',
+    # MONEY ATTRACTION
+
+    df["has_money_words"] = df["text"].str.contains(
+
+        r"high salary|easy money|earn money|weekly payout|daily payout",
+
         regex=True,
         na=False
+
     ).astype(int)
 
-    # Remote scams
-    df['has_remote_words'] = df['text'].str.contains(
-        r'work from home|remote job|online work|part time online',
+    # REMOTE JOB SCAMS
+
+    df["has_remote_words"] = df["text"].str.contains(
+
+        r"work from home|remote job|online work|part time online",
+
         regex=True,
         na=False
+
     ).astype(int)
 
-    # Suspicious contact methods
-    df['has_contact'] = df['text'].str.contains(
-        r'whatsapp|telegram|dm now|call now|contact us',
+    # CONTACT METHODS
+
+    df["has_contact"] = df["text"].str.contains(
+
+        r"whatsapp|telegram|dm now|call now|contact us",
+
         regex=True,
         na=False
+
     ).astype(int)
 
-    # No experience required scams
-    df['has_no_experience'] = df['text'].str.contains(
-        r'no experience|freshers welcome|anyone can apply',
+    # NO EXPERIENCE CLAIMS
+
+    df["has_no_experience"] = df["text"].str.contains(
+
+        r"no experience|freshers welcome|anyone can apply",
+
         regex=True,
         na=False
+
     ).astype(int)
 
-    # Unrealistic promises
-    df['has_unrealistic_offer'] = df['text'].str.contains(
-        r'guaranteed job|instant joining|earn instantly|easy work',
+    # UNREALISTIC PROMISES
+
+    df["has_unrealistic_offer"] = df["text"].str.contains(
+
+        r"guaranteed job|instant joining|earn instantly|easy work",
+
         regex=True,
         na=False
+
     ).astype(int)
 
     # =========================================
     # TEXT FEATURES
     # =========================================
 
-    # Exclamation marks
-    df['exclamation_count'] = df['text'].str.count(r'!')
+    # EXCLAMATION MARKS
 
-    # Capital words count
-    df['capital_word_count'] = df['text'].apply(
-        lambda x: sum(1 for word in x.split() if word.isupper())
+    df["exclamation_count"] = (
+
+        df["text"]
+        .str.count(r"!")
     )
 
-    # Text length
-    df['text_length'] = df['text'].apply(len)
+    # CAPITAL WORD COUNT
 
-    # Word count
-    df['word_count'] = df['text'].apply(
-        lambda x: len(x.split())
+    df["capital_word_count"] = df["text"].apply(
+
+        lambda x: sum(
+
+            1 for word in str(x).split()
+
+            if word.isupper()
+        )
     )
 
-    # Average word length
-    df['avg_word_length'] = df['text'].apply(
+    # TEXT LENGTH
+
+    df["text_length"] = df["text"].apply(len)
+
+    # WORD COUNT
+
+    df["word_count"] = df["text"].apply(
+
+        lambda x: len(str(x).split())
+    )
+
+    # AVERAGE WORD LENGTH
+
+    df["avg_word_length"] = df["text"].apply(
+
         lambda x: (
-            sum(len(word) for word in x.split()) / len(x.split())
-        ) if len(x.split()) > 0 else 0
+
+            sum(len(word) for word in str(x).split())
+
+            / len(str(x).split())
+
+        ) if len(str(x).split()) > 0 else 0
     )
 
     # =========================================
-    # REMOVE EXTRA SPACES
+    # FINAL CLEANUP
     # =========================================
 
-    df['text'] = df['text'].str.replace(
-        r'\s+',
-        ' ',
-        regex=True
-    )
+    df = df.fillna(0)
 
     return df

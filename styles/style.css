@@ -8,11 +8,19 @@
    GLOBAL STYLING
 ========================================= */
 
-html, body, [class*="css"] {
+html,
+body,
+[class*="css"] {
 
     font-family: 'Poppins', sans-serif;
 
     color: white;
+
+    letter-spacing: 0.2px;
+
+    -webkit-font-smoothing: antialiased;
+
+    -moz-osx-font-smoothing: grayscale;
 
     scroll-behavior: smooth;
 }
@@ -35,10 +43,26 @@ html, body, [class*="css"] {
 }
 
 /* =========================================
+   HIDE STREAMLIT BRANDING
+========================================= */
+
+#MainMenu,
+footer,
+header {
+
+    visibility: hidden;
+}
+
+/* =========================================
    HEADINGS
 ========================================= */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
 
     color: white;
 
@@ -48,10 +72,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* =========================================
-   PARAGRAPH & TEXT
+   TEXT
 ========================================= */
 
-p, label, span, div {
+p,
+label,
+span,
+div {
 
     color: #E2E8F0;
 }
@@ -175,6 +202,20 @@ textarea:focus {
 }
 
 /* =========================================
+   SELECT BOX
+========================================= */
+
+.stSelectbox > div > div {
+
+    background:
+    rgba(17, 24, 39, 0.95);
+
+    border-radius: 12px;
+
+    color: white;
+}
+
+/* =========================================
    METRIC CARDS
 ========================================= */
 
@@ -238,17 +279,6 @@ textarea:focus {
 }
 
 /* =========================================
-   CHARTS
-========================================= */
-
-.js-plotly-plot {
-
-    border-radius: 20px;
-
-    overflow: hidden;
-}
-
-/* =========================================
    GLASS CARD
 ========================================= */
 
@@ -279,7 +309,69 @@ textarea:focus {
 }
 
 /* =========================================
-   DESCRIPTION TEXT
+   HERO SECTION
+========================================= */
+
+.hero-title {
+
+    font-size: 62px;
+
+    font-weight: 700;
+
+    line-height: 1.1;
+
+    margin-bottom: 12px;
+}
+
+.shield-icon {
+
+    color: white;
+
+    margin-right: 10px;
+}
+
+.gradient-text {
+
+    background:
+    linear-gradient(
+        90deg,
+        #ffffff,
+        #c084fc
+    );
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+
+    font-size: 20px;
+
+    color: #CBD5E1;
+
+    letter-spacing: 0.4px;
+}
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.section-title {
+
+    font-size: 32px;
+
+    font-weight: 700;
+
+    color: #c084fc;
+
+    margin-top: 35px;
+
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   DESCRIPTION
 ========================================= */
 
 .description {
@@ -293,43 +385,6 @@ textarea:focus {
     letter-spacing: 0.2px;
 
     max-width: 950px;
-}
-
-/* =========================================
-   HERO TITLE
-========================================= */
-
-.hero-title {
-
-    font-size: 58px;
-
-    font-weight: 700;
-
-    background:
-    linear-gradient(
-        90deg,
-        #ffffff,
-        #a855f7
-    );
-
-    -webkit-background-clip: text;
-
-    -webkit-text-fill-color: transparent;
-
-    margin-bottom: 10px;
-}
-
-/* =========================================
-   HERO SUBTITLE
-========================================= */
-
-.hero-subtitle {
-
-    font-size: 20px;
-
-    color: #CBD5E1;
-
-    margin-bottom: 20px;
 }
 
 /* =========================================
@@ -361,6 +416,37 @@ textarea:focus {
     0 0 22px rgba(168,85,247,0.28);
 }
 
+.feature-box h3 {
+
+    color: white;
+
+    margin-bottom: 10px;
+}
+
+.feature-box p {
+
+    color: #CBD5E1;
+
+    line-height: 1.8;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.footer {
+
+    text-align: center;
+
+    margin-top: 50px;
+
+    color: #94A3B8;
+
+    font-size: 15px;
+
+    padding-bottom: 30px;
+}
+
 /* =========================================
    SCROLLBAR
 ========================================= */
@@ -383,20 +469,28 @@ textarea:focus {
 }
 
 /* =========================================
-   HIDE STREAMLIT BRANDING
+   MOBILE RESPONSIVE
 ========================================= */
 
-#MainMenu {
+@media screen and (max-width: 768px) {
 
-    visibility: hidden;
-}
+    .hero-title {
 
-footer {
+        font-size: 42px;
+    }
 
-    visibility: hidden;
-}
+    .hero-subtitle {
 
-header {
+        font-size: 18px;
+    }
 
-    visibility: hidden;
+    .glass-card {
+
+        padding: 20px;
+    }
+
+    .description {
+
+        font-size: 16px;
+    }
 }

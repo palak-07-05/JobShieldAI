@@ -6,11 +6,44 @@ import matplotlib.pyplot as plt
 
 from src.predict import predict_job
 from src.preprocess import clean_text
+
 from database import (
     init_db,
     insert_prediction,
     fetch_all
 )
+
+# =========================================
+# LOAD CSS
+# =========================================
+
+def load_css():
+
+    with open("styles/style.css", "r", encoding="utf-8") as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+# =========================================
+# PAGE CONFIG
+# =========================================
+
+st.set_page_config(
+
+    page_title="JobShield AI",
+
+    page_icon="🛡️",
+
+    layout="wide"
+)
+
+# =========================================
+# APPLY CSS
+# =========================================
+
+load_css()
 
 # =========================================
 # DATABASE INIT
@@ -19,22 +52,20 @@ from database import (
 init_db()
 
 # =========================================
-# PAGE CONFIG
+# SIDEBAR
 # =========================================
 
-st.set_page_config(
-    page_title="JobShield AI",
-    page_icon="🛡️",
-    layout="wide"
-)
-
-# =========================================
-# SIDEBAR MENU
-# =========================================
+st.sidebar.title("🛡️ JobShield AI")
 
 menu = st.sidebar.selectbox(
-    "Menu",
-    ["Predict", "Dashboard", "History"]
+
+    "📂 Navigation",
+
+    [
+        "Predict",
+        "Dashboard",
+        "History"
+    ]
 )
 
 # =========================================
@@ -43,142 +74,234 @@ menu = st.sidebar.selectbox(
 
 if menu == "Predict":
 
-    st.title("🛡️ JobShield AI")
-    st.subheader("AI-Powered Fake Job Detection System")
+    st.markdown("""
+    <div class="hero-title">
+        <span class="shield-icon">🛡️</span>
+        <span class="gradient-text">JobShield AI</span>
+    </div>
+
+    <div class="hero-subtitle">
+        AI-Powered Fake Job Detection Platform
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # INPUT
+    st.subheader("📄 Paste Job Description")
+
     job_text = st.text_area(
-        "Paste Job Description",
+
+        label="",
+
         height=300,
-        placeholder="Paste complete job description here..."
+
+        placeholder="""
+Paste complete job description here...
+
+Example:
+Company hiring urgently for remote work.
+No experience required.
+Weekly payout available.
+Apply now.
+"""
     )
 
+    # =========================================
     # ANALYZE BUTTON
-    if st.button("Analyze Job"):
+    # =========================================
 
-        # Empty input
+    if st.button("🔍 Analyze Job"):
+
         if not job_text.strip():
 
-            st.warning("Please enter a job description.")
+            st.warning(
+                "Please enter a job description."
+            )
 
         else:
 
-            with st.spinner("Analyzing Job Description..."):
+            with st.spinner(
+                "Analyzing job description..."
+            ):
 
                 time.sleep(1)
 
-                # Clean text
-                cleaned_text = clean_text(job_text)
+                cleaned_text = clean_text(
+                    job_text
+                )
 
-                # Prediction
-                result = predict_job(cleaned_text)
+                result = predict_job(
+                    cleaned_text
+                )
 
-                # Scores
                 fake_score = result["fake_score"]
+
                 real_score = result["real_score"]
 
-                # Prediction
-                is_fake = result["prediction"] == 1
+                is_fake = (
+                    result["prediction"] == 1
+                )
 
-                # Save to database
                 final_result = (
+
                     "FAKE JOB"
+
                     if is_fake
+
                     else "REAL JOB"
                 )
 
+                # SAVE TO DATABASE
+
                 insert_prediction(
+
                     job_text,
+
                     final_result
                 )
 
             st.markdown("---")
 
-            # RESULT SECTION
-            st.subheader("Detection Result")
+            st.subheader("🧠 Detection Result")
 
             if is_fake:
 
-                st.error("⚠️ Fake Job Detected")
-
-            else:
-
-                st.success("✅ Legitimate Job Posting")
-
-            # METRICS
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.metric(
-                    "Fake Probability",
-                    f"{fake_score:.2f}%"
-                )
-
-            with col2:
-                st.metric(
-                    "Real Probability",
-                    f"{real_score:.2f}%"
-                )
-
-            # PROGRESS BAR
-            st.write("### Scam Risk Level")
-
-            st.progress(int(fake_score) / 100)
-
-            # GAUGE CHART
-            fig = go.Figure(go.Indicator(
-
-                mode="gauge+number",
-
-                value=fake_score,
-
-                title={'text': "Fraud Risk Score"},
-
-                gauge={
-
-                    'axis': {'range': [0, 100]},
-
-                    'bar': {'color': "red"},
-
-                    'steps': [
-
-                        {'range': [0, 30], 'color': "green"},
-                        {'range': [30, 70], 'color': "orange"},
-                        {'range': [70, 100], 'color': "red"}
-
-                    ],
-                }
-            ))
-
-            fig.update_layout(height=400)
-
-            st.plotly_chart(
-                fig,
-                use_container_width=True
-            )
-
-            # FINAL MESSAGE
-            st.markdown("---")
-
-            if fake_score >= 70:
-
                 st.error(
-                    "This posting contains multiple suspicious patterns commonly found in fraudulent jobs."
-                )
-
-            elif fake_score >= 40:
-
-                st.warning(
-                    "This posting shows some suspicious characteristics. Verify company details carefully."
+                    "⚠️ Fake Job Detected"
                 )
 
             else:
 
                 st.success(
-                    "This posting appears relatively safe based on AI analysis."
+                    "✅ Legitimate Job Posting"
                 )
+
+            # =========================================
+            # METRICS
+            # =========================================
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.metric(
+
+                    "Fake Probability",
+
+                    f"{fake_score:.2f}%"
+                )
+
+            with col2:
+
+                st.metric(
+
+                    "Real Probability",
+
+                    f"{real_score:.2f}%"
+                )
+
+            st.markdown("---")
+
+            # =========================================
+            # RISK BAR
+            # =========================================
+
+            st.subheader("📊 Scam Risk Level")
+
+            st.progress(
+                fake_score / 100
+            )
+
+            # =========================================
+            # GAUGE CHART
+            # =========================================
+
+            fig = go.Figure(
+
+                go.Indicator(
+
+                    mode="gauge+number",
+
+                    value=fake_score,
+
+                    title={
+                        "text": "Fraud Risk Score"
+                    },
+
+                    gauge={
+
+                        "axis": {
+                            "range": [0, 100]
+                        },
+
+                        "bar": {
+                            "color": "#9333ea"
+                        },
+
+                        "steps": [
+
+                            {
+                                "range": [0, 30],
+                                "color": "#14532d"
+                            },
+
+                            {
+                                "range": [30, 70],
+                                "color": "#b45309"
+                            },
+
+                            {
+                                "range": [70, 100],
+                                "color": "#991b1b"
+                            }
+                        ]
+                    }
+                )
+            )
+
+            fig.update_layout(
+
+                height=400,
+
+                paper_bgcolor="rgba(0,0,0,0)",
+
+                font={
+                    "color": "white"
+                }
+            )
+
+            st.plotly_chart(
+
+                fig,
+
+                use_container_width=True
+            )
+
+            st.markdown("---")
+
+            # =========================================
+            # FINAL MESSAGE
+            # =========================================
+
+            if fake_score >= 70:
+
+                st.error("""
+⚠️ This posting contains multiple suspicious scam indicators commonly found in fraudulent job listings.
+                """)
+
+            elif fake_score >= 40:
+
+                st.warning("""
+⚠️ This posting shows some suspicious characteristics.
+
+Verify company details carefully before applying.
+                """)
+
+            else:
+
+                st.success("""
+✅ This posting appears relatively safe based on AI analysis.
+                """)
 
 # =========================================
 # DASHBOARD PAGE
@@ -188,36 +311,55 @@ elif menu == "Dashboard":
 
     st.title("📊 JobShield AI Dashboard")
 
+    st.markdown("""
+Monitor fake job detection statistics,
+AI insights, and recent prediction activity.
+    """)
+
+    st.markdown("---")
+
     rows = fetch_all()
 
     total = len(rows)
 
     fake_count = sum(
+
         1 for row in rows
+
         if "FAKE" in row[2]
     )
 
     real_count = sum(
+
         1 for row in rows
+
         if "REAL" in row[2]
     )
 
+    # =========================================
     # METRICS
+    # =========================================
+
+    st.subheader("📌 Overview")
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
+
         st.metric(
             "Total Jobs Checked",
             total
         )
 
     with col2:
+
         st.metric(
             "Fake Jobs",
             fake_count
         )
 
     with col3:
+
         st.metric(
             "Real Jobs",
             real_count
@@ -225,41 +367,72 @@ elif menu == "Dashboard":
 
     st.markdown("---")
 
+    # =========================================
     # PIE CHART
-    st.subheader("Fake vs Real Jobs")
+    # =========================================
+
+    st.subheader("📈 Detection Distribution")
 
     if total > 0:
 
-        labels = ["Fake Jobs", "Real Jobs"]
+        labels = [
+            "Fake Jobs",
+            "Real Jobs"
+        ]
 
-        sizes = [fake_count, real_count]
+        sizes = [
+            fake_count,
+            real_count
+        ]
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(
+            figsize=(5, 5)
+        )
+
+        colors = [
+            "#ef4444",
+            "#22c55e"
+        ]
 
         ax.pie(
+
             sizes,
+
             labels=labels,
+
             autopct="%1.1f%%",
-            startangle=90
+
+            startangle=90,
+
+            colors=colors
         )
 
         ax.axis("equal")
+
+        fig.patch.set_facecolor("#0f172a")
 
         st.pyplot(fig)
 
     else:
 
-        st.info("No predictions available yet.")
+        st.info(
+            "No prediction data available yet."
+        )
 
     st.markdown("---")
 
-    # TABLE
-    st.subheader("Recent Predictions")
+    # =========================================
+    # RECENT PREDICTIONS
+    # =========================================
+
+    st.subheader("🕘 Recent Predictions")
 
     if total > 0:
 
         df = pd.DataFrame(
+
             rows,
+
             columns=[
                 "ID",
                 "Job Description",
@@ -267,14 +440,67 @@ elif menu == "Dashboard":
             ]
         )
 
+        df = df[::-1]
+
         st.dataframe(
+
             df,
+
             use_container_width=True
         )
 
     else:
 
-        st.warning("No history available.")
+        st.warning(
+            "Prediction history is empty."
+        )
+
+    st.markdown("---")
+
+    # =========================================
+    # AI INSIGHTS
+    # =========================================
+
+    st.subheader("🧠 AI Insights")
+
+    if total == 0:
+
+        st.info(
+            "Analyze some job descriptions to generate insights."
+        )
+
+    elif fake_count > real_count:
+
+        st.error("""
+⚠️ High number of suspicious job postings detected.
+
+Users should verify recruiter details,
+company websites, and salary claims carefully.
+        """)
+
+    elif real_count > fake_count:
+
+        st.success("""
+✅ Most analyzed job postings appear legitimate based on AI analysis.
+        """)
+
+    else:
+
+        st.info("""
+📌 Equal number of fake and real jobs detected.
+        """)
+
+    st.markdown("---")
+
+    # =========================================
+    # SYSTEM STATUS
+    # =========================================
+
+    st.subheader("🖥️ System Status")
+
+    st.success(
+        "🟢 AI Detection System Active"
+    )
 
 # =========================================
 # HISTORY PAGE
@@ -288,18 +514,30 @@ elif menu == "History":
 
     if len(rows) > 0:
 
-        for row in rows:
+        for row in rows[::-1]:
 
             st.markdown("---")
 
-            st.write(f"### Record #{row[0]}")
+            st.subheader(
+                f"Record #{row[0]}"
+            )
 
-            st.write("#### Job Description")
+            st.markdown("### 📄 Job Description")
+
             st.write(row[1])
 
-            st.write("#### Result")
-            st.write(row[2])
+            st.markdown("### 🧠 Prediction Result")
+
+            if "FAKE" in row[2]:
+
+                st.error(row[2])
+
+            else:
+
+                st.success(row[2])
 
     else:
 
-        st.warning("No prediction history found.")
+        st.warning(
+            "No prediction history found."
+        )

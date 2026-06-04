@@ -1,11 +1,14 @@
 import sqlite3
+import config
 
 # =========================================
 # CONNECT DATABASE
 # =========================================
 
 conn = sqlite3.connect(
-    "jobshield.db",
+
+    config.DATABASE_NAME,
+
     check_same_thread=False
 )
 
@@ -17,15 +20,16 @@ c = conn.cursor()
 
 def init_db():
 
-    c.execute("""
+    c.execute(f"""
 
-    CREATE TABLE IF NOT EXISTS predictions (
+    CREATE TABLE IF NOT EXISTS {config.TABLE_NAME} (
 
         id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        job_text TEXT,
+        job_description TEXT,
 
         result TEXT
+
     )
 
     """)
@@ -36,20 +40,26 @@ def init_db():
 # INSERT PREDICTION
 # =========================================
 
-def insert_prediction(job_text, result):
+def insert_prediction(job_description, result):
 
     c.execute(
-        """
-        INSERT INTO predictions (
-            job_text,
+
+        f"""
+        INSERT INTO {config.TABLE_NAME} (
+
+            job_description,
+
             result
+
         )
 
         VALUES (?, ?)
         """,
 
         (
-            job_text,
+
+            job_description,
+
             result
         )
     )
@@ -63,9 +73,33 @@ def insert_prediction(job_text, result):
 def fetch_all():
 
     c.execute(
-        "SELECT * FROM predictions"
+
+        f"""
+        SELECT * FROM {config.TABLE_NAME}
+
+        ORDER BY id DESC
+        """
     )
 
-    data = c.fetchall()
+    return c.fetchall()
 
-    return data
+# =========================================
+# CLEAR HISTORY
+# =========================================
+
+def clear_history():
+
+    c.execute(
+
+        f"DELETE FROM {config.TABLE_NAME}"
+    )
+
+    conn.commit()
+
+# =========================================
+# CLOSE CONNECTION
+# =========================================
+
+def close_connection():
+
+    conn.close()
