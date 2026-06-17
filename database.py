@@ -6,9 +6,7 @@ import config
 # =========================================
 
 conn = sqlite3.connect(
-
     config.DATABASE_NAME,
-
     check_same_thread=False
 )
 
@@ -20,19 +18,37 @@ c = conn.cursor()
 
 def init_db():
 
-    c.execute(f"""
+    c.execute(
+        f"""
+        CREATE TABLE IF NOT EXISTS {config.TABLE_NAME}
+        (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    CREATE TABLE IF NOT EXISTS {config.TABLE_NAME} (
+            job_description TEXT,
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+            result TEXT,
 
-        job_description TEXT,
-
-        result TEXT
-
+            ai_report TEXT
+        )
+        """
     )
 
-    """)
+    # Check existing columns
+    c.execute(
+        f"PRAGMA table_info({config.TABLE_NAME})"
+    )
+
+    columns = [col[1] for col in c.fetchall()]
+
+    # Add ai_report column if missing
+    if "ai_report" not in columns:
+
+        c.execute(
+            f"""
+            ALTER TABLE {config.TABLE_NAME}
+            ADD COLUMN ai_report TEXT
+            """
+        )
 
     conn.commit()
 
@@ -40,27 +56,27 @@ def init_db():
 # INSERT PREDICTION
 # =========================================
 
-def insert_prediction(job_description, result):
+def insert_prediction(
+    job_description,
+    result,
+    ai_report=""
+):
 
     c.execute(
-
         f"""
-        INSERT INTO {config.TABLE_NAME} (
-
+        INSERT INTO {config.TABLE_NAME}
+        (
             job_description,
-
-            result
-
+            result,
+            ai_report
         )
 
-        VALUES (?, ?)
+        VALUES (?, ?, ?)
         """,
-
         (
-
             job_description,
-
-            result
+            result,
+            ai_report
         )
     )
 
@@ -73,15 +89,86 @@ def insert_prediction(job_description, result):
 def fetch_all():
 
     c.execute(
-
         f"""
-        SELECT * FROM {config.TABLE_NAME}
-
+        SELECT
+            id,
+            job_description,
+            result,
+            ai_report
+        FROM {config.TABLE_NAME}
         ORDER BY id DESC
         """
     )
 
     return c.fetchall()
+
+# =========================================
+# FETCH SINGLE RECORD
+# =========================================
+
+def fetch_by_id(record_id):
+
+    c.execute(
+        f"""
+        SELECT
+            id,
+            job_description,
+            result,
+            ai_report
+        FROM {config.TABLE_NAME}
+        WHERE id = ?
+        """,
+        (record_id,)
+    )
+
+    return c.fetchone()
+
+# =========================================
+# TOTAL RECORD COUNT
+# =========================================
+
+def get_total_predictions():
+
+    c.execute(
+        f"""
+        SELECT COUNT(*)
+        FROM {config.TABLE_NAME}
+        """
+    )
+
+    return c.fetchone()[0]
+
+# =========================================
+# FAKE JOB COUNT
+# =========================================
+
+def get_fake_count():
+
+    c.execute(
+        f"""
+        SELECT COUNT(*)
+        FROM {config.TABLE_NAME}
+        WHERE result LIKE '%FAKE%'
+        """
+    )
+
+    return c.fetchone()[0]
+
+# =========================================
+# REAL JOB COUNT
+# =========================================
+
+def get_real_count():
+
+    c.execute(
+        f"""
+        SELECT COUNT(*)
+        FROM {config.TABLE_NAME}
+        WHERE result LIKE '%REAL%'
+        """
+    )
+
+    return c.fetchone()[0]
 
 # =========================================
 # CLEAR HISTORY
@@ -90,8 +177,9 @@ def fetch_all():
 def clear_history():
 
     c.execute(
-
-        f"DELETE FROM {config.TABLE_NAME}"
+        f"""
+        DELETE FROM {config.TABLE_NAME}
+        """
     )
 
     conn.commit()

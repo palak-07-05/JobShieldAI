@@ -3,71 +3,45 @@ import time
 import plotly.graph_objects as go
 import pandas as pd
 import matplotlib.pyplot as plt
-
 from src.predict import predict_job
 from src.preprocess import clean_text
-
 from database import (
     init_db,
     insert_prediction,
     fetch_all
 )
-
-# =========================================
+from agents.fraud_agent import analyze_job
+from utils.pdf_parser import (
+    extract_text_from_pdf
+)
 # LOAD CSS
-# =========================================
-
 def load_css():
-
     with open("styles/style.css", "r", encoding="utf-8") as f:
-
         st.markdown(
             f"<style>{f.read()}</style>",
             unsafe_allow_html=True
         )
-
-# =========================================
 # PAGE CONFIG
-# =========================================
-
 st.set_page_config(
-
     page_title="JobShield AI",
-
     page_icon="🛡️",
-
     layout="wide"
 )
 
-# =========================================
 # APPLY CSS
-# =========================================
-
 load_css()
-
-# =========================================
 # DATABASE INIT
-# =========================================
-
 init_db()
-
-# =========================================
 # SIDEBAR
-# =========================================
-
 st.sidebar.title("🛡️ JobShield AI")
-
 menu = st.sidebar.selectbox(
-
     "📂 Navigation",
-
     [
         "Predict",
         "Dashboard",
         "History"
     ]
 )
-
 # =========================================
 # PREDICT PAGE
 # =========================================
@@ -89,9 +63,28 @@ if menu == "Predict":
 
     st.subheader("📄 Paste Job Description")
 
+    uploaded_pdf = st.file_uploader(
+        "📄 Upload Job Description PDF",
+        type=["pdf"]
+    )
+
+    pdf_text = ""
+
+    if uploaded_pdf:
+
+        pdf_text = extract_text_from_pdf(
+            uploaded_pdf
+        )
+
+        st.success(
+            "PDF uploaded successfully."
+        )
+
     job_text = st.text_area(
 
         label="",
+
+        value=pdf_text,
 
         height=300,
 
@@ -133,73 +126,46 @@ Apply now.
                 result = predict_job(
                     cleaned_text
                 )
-
                 fake_score = result["fake_score"]
-
                 real_score = result["real_score"]
-
                 is_fake = (
                     result["prediction"] == 1
                 )
-
                 final_result = (
-
                     "FAKE JOB"
-
                     if is_fake
-
                     else "REAL JOB"
                 )
-
                 # SAVE TO DATABASE
+                ai_report = analyze_job(job_text)
 
-                insert_prediction(
-
-                    job_text,
-
-                    final_result
-                )
-
+            insert_prediction(
+                job_text,
+                final_result,
+                ai_report
+            )   
             st.markdown("---")
-
             st.subheader("🧠 Detection Result")
-
             if is_fake:
-
                 st.error(
                     "⚠️ Fake Job Detected"
                 )
-
             else:
-
                 st.success(
                     "✅ Legitimate Job Posting"
                 )
-
-            # =========================================
             # METRICS
-            # =========================================
-
             col1, col2 = st.columns(2)
-
             with col1:
-
                 st.metric(
-
                     "Fake Probability",
-
                     f"{fake_score:.2f}%"
                 )
-
             with col2:
-
                 st.metric(
-
                     "Real Probability",
-
                     f"{real_score:.2f}%"
                 )
-
             st.markdown("---")
 
             # =========================================
@@ -279,6 +245,27 @@ Apply now.
 
             st.markdown("---")
 
+            st.subheader(
+                "🤖 Gemini AI Investigation"
+            )
+
+            with st.spinner(
+                "Gemini analyzing..."
+            ):
+
+                try:
+
+                    ai_report = analyze_job(
+                        job_text
+                    )
+
+                    st.markdown(ai_report)
+
+                except Exception as e:
+
+                    st.error(
+                        f"Gemini Analysis Failed: {str(e)}"
+                    )
             # =========================================
             # FINAL MESSAGE
             # =========================================
@@ -462,6 +449,15 @@ AI insights, and recent prediction activity.
     # =========================================
 
     st.subheader("🧠 AI Insights")
+    st.markdown("""
+### 🤖 Gemini Summary
+
+This dashboard combines:
+- Machine Learning Fraud Detection
+- Gemini AI Explainability
+- Historical Analysis
+- Risk Monitoring
+""")
 
     if total == 0:
 
