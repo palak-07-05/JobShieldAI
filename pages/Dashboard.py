@@ -266,14 +266,30 @@ if total > 0:
         columns=[
             "ID",
             "Job Description",
-            "Result"
+            "Result",
+            "AI Report",
+            "Timestamp"
         ]
     )
 
+    df_display = df.copy()
+    df_display["Job Description"] = (
+        df_display["Job Description"].fillna("").str.slice(0, 120) + "..."
+    )
+    df_display = df_display[
+        [
+            "ID",
+            "Job Description",
+            "Result",
+            "Timestamp"
+        ]
+    ]
+
     st.dataframe(
-        df,
+        df_display,
         use_container_width=True,
-        height=400
+        height=400,
+        hide_index=True
     )
 
 else:
