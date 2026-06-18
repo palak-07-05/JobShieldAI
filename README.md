@@ -43,7 +43,6 @@ Fake job postings and internship scams are increasing on online job platforms. T
 - NumPy
 - Matplotlib
 - TF-IDF
-- Google Gemini API
 
 ---
 

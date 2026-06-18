@@ -1,16 +1,10 @@
 import os
-
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-if not api_key:
-    raise RuntimeError("GEMINI_API_KEY is missing from your .env file.")
-
-client = genai.Client(api_key=api_key)
-
-for model in client.models.list():
+for model in genai.list_models():
     print(model.name)

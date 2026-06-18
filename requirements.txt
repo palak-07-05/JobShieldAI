@@ -3,6 +3,3 @@ pandas
 scikit-learn
 matplotlib
 plotly
-python-dotenv
-google-genai
-pypdf

@@ -56,8 +56,6 @@ def predict_job(text):
 
             "real_score": 0,
 
-            "confidence": 0,
-
             "message": "Empty job description"
         }
 
@@ -89,27 +87,24 @@ def predict_job(text):
 
         fake_score = 0
         real_score = 0
-        confidence = 0
 
         if hasattr(model, "predict_proba"):
 
             probabilities = model.predict_proba(vector)[0]
-            class_probabilities = dict(zip(model.classes_, probabilities))
 
-            real_score = float(round(
-                class_probabilities.get(0, 0) * 100,
+            # ASSUMING:
+            # 0 = REAL
+            # 1 = FAKE
+
+            real_score = round(
+                probabilities[0] * 100,
                 2
-            ))
+            )
 
-            fake_score = float(round(
-                class_probabilities.get(1, 0) * 100,
+            fake_score = round(
+                probabilities[1] * 100,
                 2
-            ))
-
-            confidence = float(round(max(probabilities), 4))
-        else:
-
-            confidence = 1
+            )
 
         # =========================================
         # RETURN RESULT
@@ -123,8 +118,6 @@ def predict_job(text):
 
             "real_score": real_score,
 
-            "confidence": confidence,
-
             "message": "Prediction successful"
         }
 
@@ -137,8 +130,6 @@ def predict_job(text):
             "fake_score": 0,
 
             "real_score": 0,
-
-            "confidence": 0,
 
             "message": f"Prediction error: {str(e)}"
         }

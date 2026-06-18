@@ -1,8 +1,7 @@
-import os
-
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
-print("Current folder:", os.getcwd())
-print("GEMINI_API_KEY configured:", bool(os.getenv("GEMINI_API_KEY")))
+print("Current Folder:", os.getcwd())
+print("Key:", os.getenv("GEMINI_API_KEY"))

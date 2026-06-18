@@ -3,15 +3,13 @@ import os
 
 load_dotenv()
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 # =========================================
 # MODEL CONFIGURATION
 # =========================================
 
-MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
+MODEL_PATH = "model.pkl"
 
-VECTORIZER_PATH = os.path.join(BASE_DIR, "vectorizer.pkl")
+VECTORIZER_PATH = "vectorizer.pkl"
 
 # =========================================
 # TRAINING SETTINGS
@@ -35,7 +33,7 @@ APP_LAYOUT = "wide"
 # DATABASE SETTINGS
 # =========================================
 
-DATABASE_NAME = os.path.join(BASE_DIR, "jobshield.db")
+DATABASE_NAME = "jobshield.db"
 
 TABLE_NAME = "predictions"
 
@@ -107,4 +105,4 @@ NO_DATA_MESSAGE = "No prediction data available yet."
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-2.0-flash"

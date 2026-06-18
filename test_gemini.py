@@ -1,23 +1,17 @@
 import os
-
 from dotenv import load_dotenv
-from google import genai
-
-import config
+import google.generativeai as genai
 
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
-print("Key found:", bool(api_key))
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not api_key:
-    raise RuntimeError("GEMINI_API_KEY is missing from your .env file.")
+print("Key Found:", API_KEY is not None)
 
-client = genai.Client(api_key=api_key)
+genai.configure(api_key=API_KEY)
 
-response = client.models.generate_content(
-    model=config.GEMINI_MODEL,
-    contents="Say hello in one sentence."
-)
+model = genai.GenerativeModel("gemini-2.0-flash")
+
+response = model.generate_content("Say hello in one sentence.")
 
 print(response.text)

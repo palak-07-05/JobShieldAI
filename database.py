@@ -28,9 +28,7 @@ def init_db():
 
             result TEXT,
 
-            ai_report TEXT,
-
-            timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+            ai_report TEXT
         )
         """
     )
@@ -52,15 +50,6 @@ def init_db():
             """
         )
 
-    if "timestamp" not in columns:
-
-        c.execute(
-            f"""
-            ALTER TABLE {config.TABLE_NAME}
-            ADD COLUMN timestamp TEXT
-            """
-        )
-
     conn.commit()
 
 # =========================================
@@ -79,11 +68,10 @@ def insert_prediction(
         (
             job_description,
             result,
-            ai_report,
-            timestamp
+            ai_report
         )
 
-        VALUES (?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?)
         """,
         (
             job_description,
@@ -106,8 +94,7 @@ def fetch_all():
             id,
             job_description,
             result,
-            ai_report,
-            COALESCE(timestamp, '') AS timestamp
+            ai_report
         FROM {config.TABLE_NAME}
         ORDER BY id DESC
         """
@@ -127,8 +114,7 @@ def fetch_by_id(record_id):
             id,
             job_description,
             result,
-            ai_report,
-            COALESCE(timestamp, '') AS timestamp
+            ai_report
         FROM {config.TABLE_NAME}
         WHERE id = ?
         """,
