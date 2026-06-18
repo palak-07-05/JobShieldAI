@@ -3,12 +3,18 @@ import time
 import plotly.graph_objects as go
 import pandas as pd
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
+=======
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
 from src.predict import predict_job
 from src.preprocess import clean_text
+
 from database import (
     init_db,
     insert_prediction,
     fetch_all
+<<<<<<< HEAD
 )
 from agents.fraud_agent import analyze_job
 from utils.pdf_parser import (
@@ -36,12 +42,68 @@ init_db()
 st.sidebar.title("🛡️ JobShield AI")
 menu = st.sidebar.selectbox(
     "📂 Navigation",
+=======
+)
+
+# =========================================
+# LOAD CSS
+# =========================================
+
+def load_css():
+
+    with open("styles/style.css", "r", encoding="utf-8") as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+# =========================================
+# PAGE CONFIG
+# =========================================
+
+st.set_page_config(
+
+    page_title="JobShield AI",
+
+    page_icon="🛡️",
+
+    layout="wide"
+)
+
+# =========================================
+# APPLY CSS
+# =========================================
+
+load_css()
+
+# =========================================
+# DATABASE INIT
+# =========================================
+
+init_db()
+
+# =========================================
+# SIDEBAR
+# =========================================
+
+st.sidebar.title("🛡️ JobShield AI")
+
+menu = st.sidebar.selectbox(
+
+    "📂 Navigation",
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
     [
         "Predict",
         "Dashboard",
         "History"
     ]
 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
 # =========================================
 # PREDICT PAGE
 # =========================================
@@ -63,6 +125,7 @@ if menu == "Predict":
 
     st.subheader("📄 Paste Job Description")
 
+<<<<<<< HEAD
     uploaded_pdf = st.file_uploader(
         "📄 Upload Job Description PDF",
         type=["pdf"]
@@ -99,6 +162,25 @@ Apply now.
 """
     )
 
+=======
+    job_text = st.text_area(
+
+        label="",
+
+        height=300,
+
+        placeholder="""
+Paste complete job description here...
+
+Example:
+Company hiring urgently for remote work.
+No experience required.
+Weekly payout available.
+Apply now.
+"""
+    )
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
     # =========================================
     # ANALYZE BUTTON
     # =========================================
@@ -122,6 +204,7 @@ Apply now.
                 cleaned_text = clean_text(
                     job_text
                 )
+<<<<<<< HEAD
 
                 result = predict_job(
                     cleaned_text
@@ -190,6 +273,103 @@ Apply now.
 
                     value=fake_score,
 
+=======
+
+                result = predict_job(
+                    cleaned_text
+                )
+
+                fake_score = result["fake_score"]
+
+                real_score = result["real_score"]
+
+                is_fake = (
+                    result["prediction"] == 1
+                )
+
+                final_result = (
+
+                    "FAKE JOB"
+
+                    if is_fake
+
+                    else "REAL JOB"
+                )
+
+                # SAVE TO DATABASE
+
+                insert_prediction(
+
+                    job_text,
+
+                    final_result
+                )
+
+            st.markdown("---")
+
+            st.subheader("🧠 Detection Result")
+
+            if is_fake:
+
+                st.error(
+                    "⚠️ Fake Job Detected"
+                )
+
+            else:
+
+                st.success(
+                    "✅ Legitimate Job Posting"
+                )
+
+            # =========================================
+            # METRICS
+            # =========================================
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.metric(
+
+                    "Fake Probability",
+
+                    f"{fake_score:.2f}%"
+                )
+
+            with col2:
+
+                st.metric(
+
+                    "Real Probability",
+
+                    f"{real_score:.2f}%"
+                )
+
+            st.markdown("---")
+
+            # =========================================
+            # RISK BAR
+            # =========================================
+
+            st.subheader("📊 Scam Risk Level")
+
+            st.progress(
+                fake_score / 100
+            )
+
+            # =========================================
+            # GAUGE CHART
+            # =========================================
+
+            fig = go.Figure(
+
+                go.Indicator(
+
+                    mode="gauge+number",
+
+                    value=fake_score,
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
                     title={
                         "text": "Fraud Risk Score"
                     },
@@ -224,6 +404,7 @@ Apply now.
                     }
                 )
             )
+<<<<<<< HEAD
 
             fig.update_layout(
 
@@ -270,6 +451,33 @@ Apply now.
             # FINAL MESSAGE
             # =========================================
 
+=======
+
+            fig.update_layout(
+
+                height=400,
+
+                paper_bgcolor="rgba(0,0,0,0)",
+
+                font={
+                    "color": "white"
+                }
+            )
+
+            st.plotly_chart(
+
+                fig,
+
+                use_container_width=True
+            )
+
+            st.markdown("---")
+
+            # =========================================
+            # FINAL MESSAGE
+            # =========================================
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
             if fake_score >= 70:
 
                 st.error("""
@@ -449,6 +657,7 @@ AI insights, and recent prediction activity.
     # =========================================
 
     st.subheader("🧠 AI Insights")
+<<<<<<< HEAD
     st.markdown("""
 ### 🤖 Gemini Summary
 
@@ -458,6 +667,8 @@ This dashboard combines:
 - Historical Analysis
 - Risk Monitoring
 """)
+=======
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
 
     if total == 0:
 

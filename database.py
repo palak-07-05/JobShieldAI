@@ -6,7 +6,9 @@ import config
 # =========================================
 
 conn = sqlite3.connect(
+
     config.DATABASE_NAME,
+
     check_same_thread=False
 )
 
@@ -18,16 +20,13 @@ c = conn.cursor()
 
 def init_db():
 
-    c.execute(
-        f"""
-        CREATE TABLE IF NOT EXISTS {config.TABLE_NAME}
-        (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+    c.execute(f"""
 
-            job_description TEXT,
+    CREATE TABLE IF NOT EXISTS {config.TABLE_NAME} (
 
-            result TEXT,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+<<<<<<< HEAD
             ai_report TEXT
         )
         """
@@ -49,6 +48,15 @@ def init_db():
             ADD COLUMN ai_report TEXT
             """
         )
+=======
+        job_description TEXT,
+
+        result TEXT
+
+    )
+
+    """)
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
 
     conn.commit()
 
@@ -56,27 +64,35 @@ def init_db():
 # INSERT PREDICTION
 # =========================================
 
-def insert_prediction(
-    job_description,
-    result,
-    ai_report=""
-):
+def insert_prediction(job_description, result):
 
     c.execute(
+
         f"""
-        INSERT INTO {config.TABLE_NAME}
-        (
+        INSERT INTO {config.TABLE_NAME} (
+
             job_description,
+<<<<<<< HEAD
             result,
             ai_report
         )
 
         VALUES (?, ?, ?)
+=======
+
+            result
+
+        )
+
+        VALUES (?, ?)
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
         """,
+
         (
+
             job_description,
-            result,
-            ai_report
+
+            result
         )
     )
 
@@ -89,13 +105,19 @@ def insert_prediction(
 def fetch_all():
 
     c.execute(
+
         f"""
+<<<<<<< HEAD
         SELECT
             id,
             job_description,
             result,
             ai_report
         FROM {config.TABLE_NAME}
+=======
+        SELECT * FROM {config.TABLE_NAME}
+
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
         ORDER BY id DESC
         """
     )
@@ -103,6 +125,7 @@ def fetch_all():
     return c.fetchall()
 
 # =========================================
+<<<<<<< HEAD
 # FETCH SINGLE RECORD
 # =========================================
 
@@ -171,15 +194,16 @@ def get_real_count():
     return c.fetchone()[0]
 
 # =========================================
+=======
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
 # CLEAR HISTORY
 # =========================================
 
 def clear_history():
 
     c.execute(
-        f"""
-        DELETE FROM {config.TABLE_NAME}
-        """
+
+        f"DELETE FROM {config.TABLE_NAME}"
     )
 
     conn.commit()

@@ -90,12 +90,6 @@ Fake Job Posting
 
 ## Run Project
 
-Create a `.env` file in the project root:
-
-```
-GEMINI_API_KEY=your_api_key_here
-```
-
 ```
 pip install -r requirements.txt
 streamlit run app.py

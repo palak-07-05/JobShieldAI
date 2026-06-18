@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
+=======
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
 # =========================================
 # MODEL CONFIGURATION
 # =========================================
@@ -97,6 +100,7 @@ EMPTY_INPUT_MESSAGE = "Please enter a job description."
 
 NO_HISTORY_MESSAGE = "No prediction history found."
 
+<<<<<<< HEAD
 NO_DATA_MESSAGE = "No prediction data available yet."
 
 # =========================================
@@ -106,3 +110,6 @@ NO_DATA_MESSAGE = "No prediction data available yet."
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 GEMINI_MODEL = "gemini-2.0-flash"
+=======
+NO_DATA_MESSAGE = "No prediction data available yet."
+>>>>>>> af6d2d2 (Added latest JobShieldAI updates)
